@@ -188,12 +188,12 @@ The application uses the following Supabase database tables:
 
 ### Manual Testing Checklist
 
-- [ ] User registration and login
-- [ ] Creating new conversations
-- [ ] Sending and receiving messages
-- [ ] Real-time message updates
-- [ ] Read receipt functionality
-- [ ] Error handling scenarios
+- [x] User registration and login
+- [x] Creating new conversations
+- [x] Sending and receiving messages
+- [x] Real-time message updates
+- [x] Read receipt functionality
+- [x] Error handling scenarios
 
 ---
 
