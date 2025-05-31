@@ -10,8 +10,8 @@ import {
   fetchMessages,
   sendMessage,
   convertTempChatToPermanent,
-  subscribeToMessages,
-  unsubscribe,
+  subscribeToMessagesAndReadStatus,
+  unsubscribeMultiple,
 } from "../../lib/chat";
 import { markMessagesAsRead } from "../../lib/chat/chats";
 
@@ -28,6 +28,7 @@ export interface TransformedMessages {
   sender_phone: string;
   timestamp: string;
   isOwn: boolean;
+  isRead: boolean;
 }
 
 export interface MessageWithProfile extends Message {
@@ -36,6 +37,10 @@ export interface MessageWithProfile extends Message {
     profile_picture: string;
     phone_no: string;
   };
+  message_read_status: Array<{
+    user_id: string;
+    read_at: string;
+  }>;
 }
 
 export function ChatContainer({ user }: ChatContainerProps) {
@@ -124,7 +129,7 @@ export function ChatContainer({ user }: ChatContainerProps) {
   useEffect(() => {
     if (!selectedChatId || isTemporaryChat) return;
 
-    const subscription = subscribeToMessages(selectedChatId, () => {
+    const { messagesChannel, readStatusChannel } = subscribeToMessagesAndReadStatus(selectedChatId, () => {
       // Fetch the new message with profile data
       fetchChatMessages(selectedChatId);
       // Also refresh chat list to update unread counts for other chats
@@ -132,24 +137,38 @@ export function ChatContainer({ user }: ChatContainerProps) {
     });
 
     return () => {
-      unsubscribe(subscription);
+      unsubscribeMultiple([messagesChannel, readStatusChannel]);
     };
   }, [selectedChatId, isTemporaryChat]);
 
   // Transform messages for ChatInterface component
-  const transformedMessages: TransformedMessages[] = messages.map((message) => ({
-    id: message.id,
-    content: message.content,
-    sender: message.profile.user_name,
-    sender_phone: message.profile.phone_no,
-    sender_id: message.sender_id,
-    sender_profile_picture: message.profile.profile_picture,
-    timestamp: new Date(message.created_at).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    isOwn: message.sender_id === currentUserId,
-  }));
+  const transformedMessages: TransformedMessages[] = messages.map((message) => {
+    let isRead = false;
+
+    if (message.sender_id === currentUserId) {
+      // For own messages, check if OTHER users have read the message
+      // For now, we'll check if ANY other user has read it (in group chats, this might need refinement)
+      isRead = message.message_read_status?.some((status) => status.user_id !== currentUserId) || false;
+    } else {
+      // For received messages, check if current user has read the message
+      isRead = message.message_read_status?.some((status) => status.user_id === currentUserId) || false;
+    }
+
+    return {
+      id: message.id,
+      content: message.content,
+      sender: message.profile.user_name,
+      sender_phone: message.profile.phone_no,
+      sender_id: message.sender_id,
+      sender_profile_picture: message.profile.profile_picture,
+      timestamp: new Date(message.created_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      isOwn: message.sender_id === currentUserId,
+      isRead: isRead,
+    };
+  });
 
   return (
     <div className="flex-1 flex flex-col bg-white">

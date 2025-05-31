@@ -162,7 +162,6 @@ export function SignupForm({ signupAction }: SignupFormProps) {
     }
 
     if (response?.success) {
-      setIsLoading(false);
       router.push("/");
     }
   };

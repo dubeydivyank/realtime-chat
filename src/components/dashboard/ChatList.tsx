@@ -17,9 +17,12 @@ export interface ChatWithDetails {
   updated_at: string;
   participants: Profile[];
   last_message: {
+    id: string;
     content: string;
     created_at: string;
     sender_name: string;
+    sender_id: string;
+    is_read_by_others: boolean;
   } | null;
   unread_count: number;
   isTemporary?: boolean;

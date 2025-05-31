@@ -110,7 +110,6 @@ export function LoginForm({ loginAction }: LoginFormProps) {
       setIsLoading(false);
     }
     if (response?.success) {
-      setIsLoading(false);
       router.push("/");
     }
   };

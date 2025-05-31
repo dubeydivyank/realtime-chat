@@ -44,7 +44,7 @@ export async function fetchChats(currentUserId: string): Promise<ChatWithDetails
         // Get last message - handle case where no messages exist
         const { data: lastMessageData } = await supabase
           .from("messages")
-          .select("content, created_at, sender_id")
+          .select("id, content, created_at, sender_id")
           .eq("chat_id", chat.id)
           .order("created_at", { ascending: false })
           .limit(1)
@@ -59,10 +59,26 @@ export async function fetchChats(currentUserId: string): Promise<ChatWithDetails
             .eq("id", lastMessageData.sender_id)
             .single();
 
+          // Check if the last message has been read by others (only relevant if current user sent it)
+          let isReadByOthers = false;
+          if (lastMessageData.sender_id === currentUserId) {
+            const { data: readStatus } = await supabase
+              .from("message_read_status")
+              .select("user_id")
+              .eq("message_id", lastMessageData.id)
+              .neq("user_id", currentUserId)
+              .limit(1);
+
+            isReadByOthers = Boolean(readStatus && readStatus.length > 0);
+          }
+
           lastMessage = {
+            id: lastMessageData.id,
             content: lastMessageData.content,
             created_at: lastMessageData.created_at,
             sender_name: senderProfile?.user_name || "Unknown",
+            sender_id: lastMessageData.sender_id,
+            is_read_by_others: isReadByOthers,
           };
         }
 

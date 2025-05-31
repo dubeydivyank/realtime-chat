@@ -153,7 +153,9 @@ export function ChatInterface({
                       <p className="text-sm text-gray-800 break-words p-1">{message.content}</p>
                       <div className="flex items-center justify-end mt-1 space-x-1">
                         <span className="text-xs text-gray-400">{message.timestamp}</span>
-                        {message.isOwn && <BsCheckAll className="w-4 h-4 text-green-500" />}
+                        {message.isOwn && (
+                          <BsCheckAll className={`w-4 h-4 ${message.isRead ? "text-blue-500" : "text-gray-500"}`} />
+                        )}
                       </div>
                     </div>
                   </div>

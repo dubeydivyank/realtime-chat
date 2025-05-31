@@ -62,7 +62,13 @@ export function ChatItem({ chat, currentUserId, onChatSelect, isActive }: ChatIt
             {chat.last_message.sender_name !== participant?.user_name ? (
               <>
                 <span className="text-gray-500 mr-1">
-                  <BsCheckAll className="w-4 h-4 text-gray-500" />
+                  <BsCheckAll
+                    className={`w-4 h-4 ${
+                      chat.last_message.sender_id === currentUserId && chat.last_message.is_read_by_others
+                        ? "text-blue-500"
+                        : "text-gray-500"
+                    }`}
+                  />
                 </span>
                 <div className="flex flex-row items-center justify-between w-full">
                   <span className="text-gray-500 ">

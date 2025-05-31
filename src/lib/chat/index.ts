@@ -1,4 +1,10 @@
 export { fetchMessages, sendMessage } from "./messages";
-export { fetchChats, convertTempChatToPermanent } from "./chats";
+export { fetchChats, convertTempChatToPermanent, markMessagesAsRead } from "./chats";
 export { searchUsers } from "./users";
-export { subscribeToMessages, subscribeToChatListUpdates, unsubscribe } from "./subscriptions";
+export {
+  subscribeToMessages,
+  subscribeToMessagesAndReadStatus,
+  subscribeToChatListUpdates,
+  unsubscribe,
+  unsubscribeMultiple,
+} from "./subscriptions";

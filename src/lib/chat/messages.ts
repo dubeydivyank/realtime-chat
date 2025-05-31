@@ -14,6 +14,10 @@ export async function fetchMessages(chatId: string): Promise<MessageWithProfile[
           user_name,
           profile_picture,
           phone_no
+        ),
+        message_read_status(
+          user_id,
+          read_at
         )
       `
       )
